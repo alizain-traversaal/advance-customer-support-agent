@@ -98,14 +98,12 @@ MEM0_API_KEY=your_mem0_api_key_here
 #### Using Docker (Recommended)
 
 ```bash
-# Run PostgreSQL container
 docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=toolbox_user -e POSTGRES_DB=toolbox_db -p 5432:5432 -d postgres
 ```
 
 #### Access PostgreSQL Terminal (Optional)
 
 ```bash
-# Execute postgres on terminal
 docker exec -it some-postgres psql -U toolbox_user -d toolbox_db
 ```
 
