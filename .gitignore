@@ -10,4 +10,5 @@ __pycache__
 *.pyzw
 *.pyz
 Examples
-mcp_toolbox/toolbox
+mcp_toolbox/toolbox.exe
+.cursor
