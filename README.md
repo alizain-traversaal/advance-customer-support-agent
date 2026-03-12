@@ -241,7 +241,7 @@ Once all services are running (PostgreSQL, MCP Toolbox), start the agent:
 
 ```bash
 # Run the main agent CLI
-uv run python cs_agent/agent_cli.py
+python cs_agent/agent_cli.py
 
 ```
 

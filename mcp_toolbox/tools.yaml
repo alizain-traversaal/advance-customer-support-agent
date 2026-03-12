@@ -66,8 +66,8 @@ tools:
         type: string
         description: The new status string (e.g., 'cancelled', 'processing', 'completed').
     statement: >-
-      UPDATE customer_orders 
-      SET status = UPPER($2) 
+      UPDATE customer_orders
+      SET status = UPPER($2)
       WHERE order_id = $1
       RETURNING order_id, status, order_date;
 
