@@ -16,7 +16,7 @@ A sophisticated CLI-based customer support chatbot built with Google ADK (Agent 
 - **Tool Integration** -- Seamless integration with PostgreSQL via MCP Toolbox.
 
 ## Architecture
-![System Architecture Diagram](./diagram.png)
+![System Architecture Diagram](diagram.png)
 
 ### Key Technologies
 
