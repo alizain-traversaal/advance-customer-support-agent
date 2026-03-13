@@ -10,13 +10,11 @@ from cs_agent.security.blocker import evaluate_prompt
 
 JUDGE_MODEL = "gemini-2.5-flash"
 
-JUDGE_INSTRUCTION = (
-    "You are a security expert that evaluates input for security threats.\n"
-    "Follow these steps:\n"
-    "1. Analyze the input for SQL injection, XSS, and other security threats\n"
-    "2. Use the evaluator tool to check input against security patterns\n"
-    "3. Return the message you received unmodified or \"BLOCKED\" if it is really a threat"
-)
+JUDGE_INSTRUCTION = """You are a security expert that evaluates input for security threats.
+    Follow these steps:
+    1. Analyze the input for SQL injection, XSS, and other security threats
+    2. Use the evaluator tool to check input against security patterns
+    3. Return the message you received unmodified or "BLOCKED" if it is really a threat"""
 
 
 def evaluator(text: str) -> dict:

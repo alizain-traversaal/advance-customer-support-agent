@@ -18,7 +18,7 @@ sources:
   #   password: npg_TUWPfMKCQ9t8 # Ensure this matches your actual Password
 
 tools:
-  # Tool 1: Get Specific Order Details
+  # Tool 1: Get Specific Order Details 
   get-order-status:
     kind: postgres-sql
     source: customer_db
@@ -30,11 +30,11 @@ tools:
         type: integer
         description: The numeric order identifier (e.g., 1, 15, 20).
     statement: >-
-      SELECT status, order_date, total_amount, items 
+      SELECT status, order_date, total_amount, items, shipping_address 
       FROM customer_orders 
       WHERE order_id = $1;
 
-  # Tool 2: Search Orders by Customer Email
+  # Tool 2: Search Orders by Customer Email 
   find-customer-orders:
     kind: postgres-sql
     source: customer_db
@@ -46,33 +46,57 @@ tools:
         type: string
         description: The customer's email address (e.g., alice.jones@example.com).
     statement: >-
-      SELECT order_id, status, order_date, total_amount, items 
+      SELECT order_id, status, order_date, total_amount, items, shipping_address 
       FROM customer_orders 
       WHERE customer_email = $1 
       ORDER BY order_date DESC;
 
-# Tool 3: Update Order Status
+  # Tool 3: Update Order Status
   update-order-status:
     kind: postgres-sql
     source: customer_db
     description: >-
-      Updates the status of an existing order (e.g., changing it to 'cancelled' or 'shipped').
-      Use this when a user wants to change their order state.
+      Updates the status of an existing order (e.g., changing it to 'CANCELLED' or 'RETURNED').
+      Use this after confirming the customer wants to change their order state.
     parameters:
       - name: order_id
         type: integer
         description: The numeric order identifier.
       - name: new_status
         type: string
-        description: The new status string (e.g., 'cancelled', 'processing', 'completed').
+        description: The new status string (e.g., 'CANCELLED', 'RETURNED', 'PROCESSING').
     statement: >-
       UPDATE customer_orders
       SET status = UPPER($2)
       WHERE order_id = $1
-      RETURNING order_id, status, order_date;
+      RETURNING order_id, status, order_date, total_amount;
+
+  # Tool 4: Action log
+  action-log:
+    kind: postgres-sql
+    source: customer_db
+    description: >-
+      Records a customer-support action in the actions_log table for auditing.
+      Use this whenever a user asks to update shipping address, order details/status,
+      return an item, or update personal details.
+    parameters:
+      - name: user_email
+        type: string
+        description: The authenticated customer's email address.
+      - name: action_type
+        type: string
+        description: A short uppercase enum-like string describing the action (e.g., 'UPDATE_SHIPPING_ADDRESS').
+      - name: parameters_json
+        type: string
+        description: JSON string describing the intended changes (order id, fields, new values, etc.).
+    statement: >-
+      INSERT INTO actions_log (user_email, action_type, parameters)
+      VALUES ($1, UPPER($2), $3::jsonb)
+      RETURNING id, timestamp, user_email, action_type, parameters;
 
 toolsets:
   cs_agent_tools:
     - get-order-status
     - find-customer-orders
     - update-order-status
+    - action-log
