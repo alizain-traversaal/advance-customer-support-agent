@@ -177,10 +177,19 @@ def _loading_label_for_request(user_input: str) -> str:
     if "status" in text or "track" in text:
         return "Fetching order status"
     if "address" in text:
-        return "Updating address details"
+        return "Updating delivery address"
     if "return" in text or "refund" in text:
         return "Processing return request"
     return "Processing your request"
+
+
+def _print_main_menu() -> None:
+    """Display a quick menu of what the agent can do."""
+    print("\nYou can ask me to:")
+    print("  1. Check the status of a specific order (e.g., \"What's the status of order 5?\").")
+    print("  2. Show your order history (e.g., \"Show all my past orders.\").")
+    print("  3. Request to cancel or return an order.")
+    print("  4. Request to update your delivery address or contact details.")
 
 
 async def main():
@@ -202,7 +211,8 @@ async def main():
     email = input("Enter your email: ").strip()
     password = getpass("Enter your password: ").strip()
 
-    await _show_loading("Authenticating user")
+    # Multi-step startup loader to make the experience feel polished.
+    await _show_loading("[1/4] Authenticating user")
 
     user_context = authenticate_user(email=email, password=password)
     if not user_context:
@@ -210,11 +220,11 @@ async def main():
         return
 
     USER_ID = user_context["email"]
-    print(
-        f"Agent: Hello {user_context['full_name']}! "
-        "Welcome to the Customer Support Assistant. "
-        "How can I help you today?"
-    )
+
+    # Continue the loader sequence now that we know who the user is.
+    await _show_loading("[2/4] Loading user memory")
+    await _show_loading("[3/4] Loading current orders")
+    await _show_loading("[4/4] Loading previous actions")
 
     # Fetch and display action log for this user
     actions = get_user_actions(USER_ID)
@@ -228,6 +238,12 @@ async def main():
         print()
     else:
         print("\nNo previous actions recorded.\n")
+
+    if user_context['is_premium_customer']:
+        print(f"Agent: Hello {user_context['full_name']}! Welcome to the Customer Support Assistant. How can I help you today? You are a premium customer and have {user_context['total_items_purchased']} items purchased.")
+    else:
+        print( f"Agent: Hello {user_context['full_name']}! Welcome to the Customer Support Assistant. How can I help you today?")
+    _print_main_menu()
 
     IMPROVED_SQL_PROMPT_INSTRUCTION = SQL_PROMPT_INSTRUCTION.format(USER_ID=USER_ID)
 
