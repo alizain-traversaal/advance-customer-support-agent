@@ -14,10 +14,9 @@ A sophisticated CLI-based customer support chatbot built with Google ADK (Agent 
 - **Persistent Memory** -- Remembers past conversations and user preferences using Mem0.
 - **Session Management** -- Maintains conversation context within a session.
 - **Tool Integration** -- Seamless integration with PostgreSQL via MCP Toolbox.
-- **Evaluation Framework** -- 95 test scenarios (57 malicious + 38 legitimate) for security regression testing.
 
 ## Architecture
-![System Architecture Diagram](diagram.png)
+![System Architecture Diagram](./diagram.png)
 
 ### Key Technologies
 
