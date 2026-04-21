@@ -58,3 +58,71 @@ def greet_user(user_id):
         conn.close()
 
 
+def authenticate_user(email: str, password: str):
+    """Authenticate a user by email and password stored in the users table."""
+    try:
+        conn = psycopg2.connect(
+            dbname="toolbox_db",
+            user="toolbox_user",
+            password="mysecretpassword",
+            host="127.0.0.1",
+            port="5432",
+        )
+        cur = conn.cursor()
+        query = """
+            SELECT user_id, full_name, email, is_premium_customer, total_items_purchased
+            FROM users
+            WHERE email = %s AND password = %s;
+        """
+        cur.execute(query, (email, password))
+        row = cur.fetchone()
+        if not row:
+            return None
+
+        return {
+            "user_id": row[0],
+            "full_name": row[1],
+            "email": row[2],
+            "is_premium_customer": row[3],
+            "total_items_purchased": row[4],
+        }
+    except Exception:
+        return None
+    finally:
+        try:
+            cur.close()
+            conn.close()
+        except Exception:
+            pass
+
+
+def get_user_actions(email: str):
+    """Fetch all actions from actions_log for the given user email.
+    Returns a list of dicts with keys: id, timestamp, action_type, parameters.
+    Returns empty list on error or if table does not exist.
+    """
+    try:
+        conn = psycopg2.connect(
+            dbname="toolbox_db",
+            user="toolbox_user",
+            password="mysecretpassword",
+            host="127.0.0.1",
+            port="5432",
+        )
+        cur = conn.cursor()
+        query = """
+            SELECT id, timestamp, action_type, parameters
+            FROM actions_log
+            WHERE user_email = %s
+            ORDER BY timestamp DESC;
+        """
+        cur.execute(query, (email,))
+        rows = cur.fetchall()
+        cols = [desc[0] for desc in cur.description]
+        result = [dict(zip(cols, row)) for row in rows]
+        cur.close()
+        conn.close()
+        return result
+    except Exception:
+        return []
+
